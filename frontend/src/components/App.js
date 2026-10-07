@@ -11,6 +11,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import ConnectCard from './ConnectCard';
 import DeployCard from './DeployCard';
 import MaterialCard from './MaterialCard';
+import SystemPanel from './SystemPanel';
 import ThemeCard from './ThemeCard';
 import UploadCard from './UploadCard';
 
@@ -97,6 +98,15 @@ function App() {
     },
   });
 
+  if (window.location.pathname === '/system') {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SystemPanel />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -155,6 +165,11 @@ function App() {
               </Link>{' '}
               Starter Project
             </h1>
+            <Typography variant="body2">
+              <Link className={classes.link} href="/system">
+                /system — configuration audit
+              </Link>
+            </Typography>
           </Box>
         </Box>
         <Grid container className={classes.container} spacing={2}>

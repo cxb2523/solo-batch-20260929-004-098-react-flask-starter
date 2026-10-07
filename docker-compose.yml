@@ -23,12 +23,16 @@ services:
     labels:
       shipyard.route: '/api'
     build: 'backend'
+    env_file:
+      - backend/backend.env
     environment:
+      APP_ROLE: 'web'
+      AUDIT_COMPOSE_FILE: '/run/compose/docker-compose.yml'
       DATABASE_URL: 'postgres://obscure-user:obscure-password@postgres/app'
       DEV: ${DEV}
-      FLASK_DEBUG: '1'
-      LOCALSTACK_HOST: 'localstack'
     volumes:
+      - './docker-compose.yml:/run/compose/docker-compose.yml:ro'
+      - './backend/backend.env:/run/compose/backend/backend.env:ro'
       - './backend/filesystem/entrypoints:/entrypoints:ro'
       - './backend/migrations:/srv/migrations'
       - './backend/src:/srv/src:ro'
@@ -43,13 +47,17 @@ services:
     labels:
       shipyard.init: 'poetry run flask db upgrade'
     build: 'backend'
+    env_file:
+      - backend/backend.env
     environment:
+      APP_ROLE: 'worker'
+      AUDIT_COMPOSE_FILE: '/run/compose/docker-compose.yml'
       DATABASE_URL: 'postgres://obscure-user:obscure-password@postgres/app'
       DEV: ${DEV}
-      FLASK_DEBUG: '1'
-      LOCALSTACK_HOST: 'localstack'
     command: '/entrypoints/worker.sh'
     volumes:
+      - './docker-compose.yml:/run/compose/docker-compose.yml:ro'
+      - './backend/backend.env:/run/compose/backend/backend.env:ro'
       - './backend/filesystem/entrypoints:/entrypoints:ro'
       - './backend/migrations:/srv/migrations'
       - './backend/src:/srv/src:ro'

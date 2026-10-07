@@ -1,7 +1,9 @@
-from flask import Flask
+import os
+
+from flask import Flask, jsonify
 from flask_migrate import Migrate
 
-from src import routes, utils as u
+from src import audit, routes, utils as u
 from src.models import db
 from src.settings import Settings as S
 from src.tasks import make_celery
@@ -45,3 +47,10 @@ class Application:
         @self.flask_app.route('/')
         def home(key):
             return 'home'
+
+        @self.flask_app.route('/api/system/audit')
+        def system_audit():
+            # Single implementation lives in src.audit — do not re-resolve
+            # anything here.
+            report = audit.build_report(role=os.environ.get('APP_ROLE', 'web'))
+            return jsonify(report)

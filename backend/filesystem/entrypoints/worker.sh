@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Run alembic migrations exactly once per deployment (idempotent and
+# guarded by a Postgres advisory lock, so repeated/retried starts heal).
+# Only the worker migrates; the web service never does.
+poetry run python -m src.migrate
+
 if [ ${DEV:-False} = 'true' ]; then
   # Run celery in the background
   # NOTE: -B is for the heartbeat task scheduler

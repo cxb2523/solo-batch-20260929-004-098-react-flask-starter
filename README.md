@@ -25,3 +25,18 @@ and [Shipyard](https://shipyard.build) out of the box.
 - Visit the app at http://localhost:3000.
 - Visit http://localhost:8080/api/v1/files to list objects in LocalStack s3 bucket.
 - Make your code changes! The app will reload whenever you save.
+
+## Configuration audit
+
+- `backend/src/audit.py` is the single implementation of the config audit
+  contract. Both `python -m backend.src.entry audit [--json]` (CLI) and
+  `GET /api/system/audit` (web) only call it — each key reports its
+  effective value, source layer (default / environment variable / compose
+  environment / compose env_file), the process role and the alembic state.
+- Visit http://localhost:3000/system for the read-only panel; overridden
+  keys are highlighted and any drift between the two parse paths is shown
+  in red (the CLI exits non-zero on drift).
+- Alembic migrations run once, from the worker only
+  (`poetry run python -m src.migrate`, guarded by a Postgres advisory
+  lock). The web service returns 503 on data endpoints until the database
+  is at the head revision.
